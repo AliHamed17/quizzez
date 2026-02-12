@@ -6,7 +6,16 @@ let myNickname = '';
 const urlParams = new URLSearchParams(window.location.search);
 const roomParam = urlParams.get('room');
 if (roomParam) {
+    // If room param exists, skip landing
     document.getElementById('room-code').value = roomParam;
+    showScreen('login-screen');
+}
+
+function chooseRole(role) {
+    if (role === 'student') {
+        showScreen('login-screen');
+        playSound('join'); // Reuse join sound for feedback
+    }
 }
 
 function joinQuiz() {
@@ -120,6 +129,7 @@ socket.on('question_ended', (data) => {
         title.className = lastResult.isCorrect ? "result-correct" : "result-incorrect";
         points.innerText = `Points Earned: ${lastResult.points}`;
         playSound(lastResult.isCorrect ? 'correct' : 'wrong');
+        if (lastResult.isCorrect) fireConfetti();
     } else {
         title.innerText = "Time's up!";
         title.className = "result-incorrect";
@@ -159,4 +169,20 @@ function submitAnswer(index, btn) {
 function showScreen(id) {
     document.querySelectorAll('.container > div').forEach(d => d.classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
+}
+
+function fireConfetti() {
+    const colors = ['#ef4444', '#3b82f6', '#eab308', '#10b981', '#8b5cf6'];
+    for (let i = 0; i < 50; i++) {
+        const div = document.createElement('div');
+        div.className = 'confetti';
+        div.style.left = Math.random() * 100 + 'vw';
+        div.style.top = '-10px';
+        div.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        div.style.animationDuration = (Math.random() * 2 + 1) + 's'; // 1-3s
+        document.body.appendChild(div);
+
+        // Remove after animation
+        setTimeout(() => div.remove(), 3000);
+    }
 }

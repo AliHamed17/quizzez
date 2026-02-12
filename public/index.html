@@ -9,9 +9,33 @@
 </head>
 
 <body>
+    <ul class="circles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
     <div class="container" id="app">
+        <!-- Landing Screen (Role Selection) -->
+        <div id="landing-screen">
+            <h1>Python Quiz</h1>
+            <p>Select your role:</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                <button onclick="chooseRole('student')" style="background: var(--secondary); font-size: 1.2rem;">🎓
+                    Student</button>
+                <button onclick="location.href='/host'" style="background: var(--primary); font-size: 1.2rem;">👨‍🏫
+                    Teacher</button>
+            </div>
+        </div>
+
         <!-- Login Screen -->
-        <div id="login-screen">
+        <div id="login-screen" class="hidden">
             <h1>Join Quiz</h1>
             <input type="text" id="nickname" placeholder="Enter Nickname" maxlength="12">
 
@@ -30,8 +54,8 @@
 
         <!-- Waiting / Lobby Screen -->
         <div id="lobby-screen" class="hidden">
-            <h2>Welcome, <span id="player-name"></span>!</h2>
-            <p>Waiting for teacher to start...</p>
+            <h2>Welcome, <span id="player-name"></span>! 👋</h2>
+            <p>Waiting for the teacher to start... ⏳</p>
             <div class="loader">...</div>
         </div>
 
