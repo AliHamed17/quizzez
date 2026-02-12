@@ -140,19 +140,39 @@ io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
     // --- HOST EVENTS ---
-    socket.on('create_room', () => {
-        const roomCode = generateRoomCode();
+    socket.on('request_rooms', () => {
+        const activeRooms = Object.values(rooms)
+            .filter(r => r.state === 'lobby')
+            .map(r => r.code); // Assuming we store code in room object or need to find it
+        // Wait, rooms structure is { roomCode: { ... } }
+        // We need to pass the codes.
+        const roomCodes = Object.keys(rooms).filter(code => rooms[code].state === 'lobby');
+        socket.emit('active_rooms', roomCodes);
+    });
+
+    socket.on('create_room', (customCode) => {
+        const roomCode = customCode ? customCode.toString().toUpperCase() : generateRoomCode();
+
+        if (rooms[roomCode]) {
+            socket.emit('error_message', 'Room code already exists. Please choose another.');
+            return;
+        }
+
         rooms[roomCode] = {
+            code: roomCode,
             hostId: socket.id,
-            players: {}, // { socketId: { nickname, score, lastAnswerTime, answers: [] } }
+            players: {},
             currentQuestionIndex: -1,
-            state: 'lobby', // lobby, question, leaderboard, finished
+            state: 'lobby',
             timer: null,
             timeRemaining: 0,
         };
         socket.join(roomCode);
         socket.emit('room_created', roomCode);
         console.log(`Room created: ${roomCode}`);
+
+        // Broadcast new room list to everyone
+        io.emit('active_rooms', Object.keys(rooms).filter(c => rooms[c].state === 'lobby'));
     });
 
     socket.on('start_quiz', (roomCode) => {

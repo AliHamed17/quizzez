@@ -3,8 +3,16 @@ let roomCode = null;
 let currentPlayers = [];
 
 function createRoom() {
-    socket.emit('create_room');
+    const custom = document.getElementById('custom-room-code').value.trim();
+    socket.emit('create_room', custom);
 }
+
+socket.on('error_message', (msg) => {
+    // Show error on host setup screen if it exists, roughly
+    const errEl = document.getElementById('host-error');
+    if (errEl) errEl.innerText = msg;
+    else alert(msg);
+});
 
 socket.on('room_created', (code) => {
     roomCode = code;
@@ -23,6 +31,10 @@ socket.on('lobby_update', (players) => {
     list.innerHTML = '';
 
     if (players.length === 0) list.innerText = "Waiting for players...";
+
+    if (players.length > document.getElementsByClassName('player-bubble').length) {
+        playSound('join');
+    }
 
     players.forEach(p => {
         const span = document.createElement('span');
@@ -54,7 +66,9 @@ socket.on('answer_submitted', () => {
 });
 
 socket.on('timer_update', (time) => {
-    document.getElementById('host-timer').innerText = time;
+    const el = document.getElementById('host-timer');
+    el.innerText = time;
+    if (time <= 5) playSound('tick');
 });
 
 socket.on('question_ended', (data) => {

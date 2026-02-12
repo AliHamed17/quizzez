@@ -1,18 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Python Quiz - Student</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="container" id="app">
         <!-- Login Screen -->
         <div id="login-screen">
             <h1>Join Quiz</h1>
             <input type="text" id="nickname" placeholder="Enter Nickname" maxlength="12">
-            <input type="text" id="room-code" placeholder="Room Code (optional)">
+
+            <div id="room-selection-container">
+                <select id="active-rooms"
+                    style="width: 80%; padding: 0.75rem; margin-bottom: 1rem; border-radius: 0.5rem; display: none;">
+                    <option value="">-- Select Active Room --</option>
+                </select>
+                <input type="text" id="room-code" value="1" placeholder="Room Code (or select above)">
+            </div>
+
             <br>
             <button onclick="joinQuiz()">Join</button>
             <p id="error-msg" style="color: red;"></p>
@@ -54,6 +64,8 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
+    <script src="js/audio.js"></script>
     <script src="js/student.js"></script>
 </body>
+
 </html>

@@ -51,8 +51,40 @@ socket.on('new_question', (data) => {
     });
 });
 
+// Request rooms on load
+socket.emit('request_rooms');
+
+socket.on('active_rooms', (rooms) => {
+    const select = document.getElementById('active-rooms');
+    const input = document.getElementById('room-code');
+
+    // Clear existing (keep first)
+    select.innerHTML = '<option value="">-- Select Active Room --</option>';
+
+    if (rooms.length > 0) {
+        select.style.display = 'inline-block';
+        rooms.forEach((code) => {
+            const opt = document.createElement('option');
+            opt.value = code;
+            opt.innerText = `Room ${code}`;
+            select.appendChild(opt);
+        });
+
+        select.onchange = () => {
+            if (select.value) {
+                input.value = select.value;
+                playSound('tick'); // feedback
+            }
+        };
+    } else {
+        select.style.display = 'none';
+    }
+});
+
 socket.on('timer_update', (time) => {
-    document.getElementById('time-left').innerText = time;
+    const el = document.getElementById('time-left');
+    el.innerText = time;
+    if (time <= 5) playSound('tick');
 });
 
 socket.on('answer_received', ({ isCorrect, points }) => {
@@ -87,10 +119,12 @@ socket.on('question_ended', (data) => {
         title.innerText = lastResult.isCorrect ? "Correct!" : "Incorrect!";
         title.className = lastResult.isCorrect ? "result-correct" : "result-incorrect";
         points.innerText = `Points Earned: ${lastResult.points}`;
+        playSound(lastResult.isCorrect ? 'correct' : 'wrong');
     } else {
         title.innerText = "Time's up!";
         title.className = "result-incorrect";
         points.innerText = "Points Earned: 0";
+        playSound('wrong');
     }
 
     document.getElementById('correct-answer-display').innerHTML = `Correct Answer: <b>${data.leaderboard[0] ? 'See Host' : '...'}</b>`;
