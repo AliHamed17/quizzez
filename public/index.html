@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Quiz - Student</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" id="app">
+        <!-- Login Screen -->
+        <div id="login-screen">
+            <h1>Join Quiz</h1>
+            <input type="text" id="nickname" placeholder="Enter Nickname" maxlength="12">
+            <input type="text" id="room-code" placeholder="Room Code (optional)">
+            <br>
+            <button onclick="joinQuiz()">Join</button>
+            <p id="error-msg" style="color: red;"></p>
+        </div>
+
+        <!-- Waiting / Lobby Screen -->
+        <div id="lobby-screen" class="hidden">
+            <h2>Welcome, <span id="player-name"></span>!</h2>
+            <p>Waiting for teacher to start...</p>
+            <div class="loader">...</div>
+        </div>
+
+        <!-- Question Screen -->
+        <div id="question-screen" class="hidden">
+            <div class="timer">Time: <span id="time-left">20</span>s</div>
+            <h2 id="question-text">Question?</h2>
+            <h3 id="question-ar" dir="rtl" style="color: #666; font-weight: normal;">سؤال؟</h3>
+            <div class="options-grid" id="options-container">
+                <!-- Buttons injected by JS -->
+            </div>
+        </div>
+
+        <!-- Result Screen (After each question) -->
+        <div id="result-screen" class="hidden">
+            <h2 id="result-title"></h2>
+            <p id="points-earned"></p>
+            <p id="correct-answer-display"></p>
+            <p id="explanation-text"></p>
+            <hr>
+            <p>Waiting for next question...</p>
+        </div>
+
+        <!-- Final Screen -->
+        <div id="final-screen" class="hidden">
+            <h1>Quiz Finished!</h1>
+            <p>Your Rank: <span id="final-rank"></span></p>
+            <p>Total Score: <span id="final-score"></span></p>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/student.js"></script>
+</body>
+</html>

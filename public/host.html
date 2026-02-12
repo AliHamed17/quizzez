@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Quiz - HOST</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .container {
+            max-width: 800px;
+        }
+
+        .stat-box {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Start Screen -->
+        <div id="setup-screen">
+            <h1>Quiz Host</h1>
+            <button onclick="createRoom()">Create New Room</button>
+        </div>
+
+        <!-- Lobby -->
+        <div id="lobby-screen" class="hidden">
+            <h2>Room Code: <span id="display-room-code" style="color: var(--primary); font-size: 2rem;"></span></h2>
+            <p>Share: <a id="share-link" href="#" target="_blank">link</a></p>
+            <div id="players-list" style="margin: 20px 0; min-height: 100px; border: 2px dashed #ccc; padding: 10px;">
+                Waiting for players...
+            </div>
+            <button onclick="startQuiz()">Start Quiz</button>
+        </div>
+
+        <!-- Game Control -->
+        <div id="game-screen" class="hidden">
+            <h2 id="host-q-text">Question 1</h2>
+            <div class="timer">Time: <span id="host-timer">20</span>s</div>
+
+            <div id="live-stats">
+                <p>Answers: <span id="answers-count">0</span> / <span id="total-players">0</span></p>
+            </div>
+
+            <!-- Shown when question ends -->
+            <div id="question-results" class="hidden">
+                <h3>Correct Answer: <span id="correct-answer-text"></span></h3>
+                <div id="leaderboard-preview"></div>
+                <button onclick="nextQuestion()">Next Question</button>
+            </div>
+        </div>
+
+        <!-- Final Leaderboard -->
+        <div id="final-screen" class="hidden">
+            <h1>Quiz Finished!</h1>
+            <ul id="final-leaderboard" class="leaderboard-list"></ul>
+            <button onclick="resetRoom()">Reset Room</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/host.js"></script>
+</body>
+
+</html>

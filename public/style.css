@@ -1,0 +1,133 @@
+:root {
+  --primary: #4F46E5;
+  --secondary: #10B981;
+  --danger: #EF4444;
+  --dark: #1F2937;
+  --light: #F3F4F6;
+  --white: #FFFFFF;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--light);
+  color: var(--dark);
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
+}
+
+.container {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 600px;
+}
+
+h1, h2 {
+  margin-bottom: 1rem;
+}
+
+input {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  width: 80%;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+button {
+  background-color: var(--primary);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin: 0.5rem;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Quiz Styles */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.option-btn {
+  background-color: var(--white);
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.option-btn:hover {
+  background-color: var(--primary);
+  color: white;
+}
+
+.timer {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--danger);
+  margin: 1rem 0;
+}
+
+.leaderboard-list {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+}
+
+.leaderboard-list li {
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+}
+
+.result-correct {
+  color: var(--secondary);
+  font-size: 1.2rem;
+}
+.result-incorrect {
+  color: var(--danger);
+  font-size: 1.2rem;
+}
+
+/* Host Specific */
+.host-controls {
+  margin-top: 2rem;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.player-bubble {
+    display: inline-block;
+    background: #e0e7ff;
+    color: #3730a3;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    margin: 0.25rem;
+    font-size: 0.875rem;
+}
