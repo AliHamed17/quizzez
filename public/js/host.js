@@ -23,6 +23,7 @@ socket.on('room_created', (code) => {
     const link = document.getElementById('share-link');
     link.href = url;
     link.innerText = url;
+    startLobbyMusic(); // Start upbeat music
 });
 
 socket.on('lobby_update', (players) => {
@@ -49,6 +50,7 @@ socket.on('lobby_update', (players) => {
 
 function startQuiz() {
     if (currentPlayers.length === 0 && !confirm("No players joined. Start anyway?")) return;
+    stopLobbyMusic(); // Stop lobby music
     socket.emit('start_quiz', roomCode);
 }
 
@@ -58,6 +60,7 @@ socket.on('new_question', (data) => {
     document.getElementById('host-q-text').innerText = `Q${data.index}: ${data.question}`;
     document.getElementById('host-timer').innerText = 20;
     document.getElementById('answers-count').innerText = 0;
+    startMusic(data.index); // Start suspense music with variation
 });
 
 socket.on('answer_submitted', () => {
@@ -72,6 +75,7 @@ socket.on('timer_update', (time) => {
 });
 
 socket.on('question_ended', (data) => {
+    stopMusic(); // Stop music
     document.getElementById('question-results').classList.remove('hidden');
 
     // We don't have the text of the correct answer directly here unless we map it from index, 
@@ -82,13 +86,18 @@ socket.on('question_ended', (data) => {
 
     document.getElementById('correct-answer-text').innerText = `Option ${data.correctIndex + 1}`; // Simple fallback
 
-    // Show mini leaderboard
+    // Show FULL leaderboard
     const lbDiv = document.getElementById('leaderboard-preview');
-    lbDiv.innerHTML = '<h4>Top 5 Rules:</h4><ul class="leaderboard-list">';
-    data.leaderboard.slice(0, 5).forEach(p => {
-        lbDiv.innerHTML += `<li><span>${p.nickname}</span> <span>${p.score}</span></li>`;
+    lbDiv.innerHTML = '<h4>Leaderboard:</h4><div style="max-height: 300px; overflow-y: auto;"><ul class="leaderboard-list">';
+    data.leaderboard.forEach((p, index) => {
+        let rankStr = `#${index + 1}`;
+        if (index === 0) rankStr = '🥇';
+        if (index === 1) rankStr = '🥈';
+        if (index === 2) rankStr = '🥉';
+
+        lbDiv.querySelector('ul').innerHTML += `<li><span>${rankStr} ${p.nickname}</span> <span>${p.score}</span></li>`;
     });
-    lbDiv.innerHTML += '</ul>';
+    lbDiv.innerHTML += '</ul></div>';
 });
 
 function nextQuestion() {
@@ -96,6 +105,7 @@ function nextQuestion() {
 }
 
 socket.on('quiz_finished', (leaderboard) => {
+    stopMusic(); // Stop music
     showScreen('final-screen');
     const ul = document.getElementById('final-leaderboard');
     ul.innerHTML = '';

@@ -28,6 +28,14 @@ function joinQuiz() {
     }
 
     myNickname = nickname;
+
+    // Force Audio Context resume for mobile autoplay policy
+    if (typeof audioCtx !== 'undefined' && audioCtx.state === 'suspended') {
+        audioCtx.resume().then(() => {
+            console.log("AudioContext resumed on Join click");
+        });
+    }
+
     socket.emit('join_room', { nickname, roomCode });
 }
 
@@ -58,6 +66,8 @@ socket.on('new_question', (data) => {
         btn.onclick = () => submitAnswer(index, btn);
         container.appendChild(btn);
     });
+
+    startMusic(data.index); // Play suspense music on phone
 });
 
 // Request rooms on load
@@ -101,14 +111,7 @@ socket.on('answer_received', ({ isCorrect, points }) => {
     // Could show a specific "Answer Sent" screen, but simpler to just lock buttons
 });
 
-socket.on('question_ended', (data) => {
-    showScreen('result-screen');
-    const resultTitle = document.getElementById('result-title');
-    // We don't know correctness here unless we stored it locally or server told us earlier.
-    // Ideally server tells us result immediately or here.
-    // Let's rely on what we know locally? No, server logic is safer.
-    // Actually, `answer_received` event gave us info. 
-});
+
 
 // Update: Let's handle local state for "Answer Sent"
 let lastResult = null;
@@ -120,18 +123,29 @@ socket.on('answer_received', (data) => {
 });
 
 socket.on('question_ended', (data) => {
+    stopMusic(); // Stop suspense music on phone
     showScreen('result-screen');
     const title = document.getElementById('result-title');
     const points = document.getElementById('points-earned');
 
     if (lastResult) {
-        title.innerText = lastResult.isCorrect ? "Correct!" : "Incorrect!";
+        const feedbackMsgs = ["Genius! 🧠", "On Fire! 🔥", "Unstoppable! 🚀", "Too Easy! 😎", "Correct! ✨"];
+        const randomMsg = feedbackMsgs[Math.floor(Math.random() * feedbackMsgs.length)];
+
+        title.innerText = lastResult.isCorrect ? randomMsg : "Next time! 💪";
         title.className = lastResult.isCorrect ? "result-correct" : "result-incorrect";
-        points.innerText = `Points Earned: ${lastResult.points}`;
+
+        let scoreText = `Points Earned: ${lastResult.points}`;
+        if (lastResult.streak && lastResult.streak > 1) {
+            scoreText += ` (Streak x${lastResult.streak} 🔥 +${lastResult.streakBonus})`;
+            fireConfetti(); // Extra confetti for streak
+        }
+
+        points.innerText = scoreText;
         playSound(lastResult.isCorrect ? 'correct' : 'wrong');
         if (lastResult.isCorrect) fireConfetti();
     } else {
-        title.innerText = "Time's up!";
+        title.innerText = "Time's up! ⏰";
         title.className = "result-incorrect";
         points.innerText = "Points Earned: 0";
         playSound('wrong');
@@ -142,10 +156,34 @@ socket.on('question_ended', (data) => {
     // Actually server sent explanation.
     document.getElementById('explanation-text').innerText = data.explanation;
 
+    // Show FULL leaderboard
+    const lbDiv = document.getElementById('student-leaderboard');
+    if (lbDiv) {
+        lbDiv.innerHTML = '<h4 style="margin-bottom:5px;">Leaderboard:</h4><div style="max-height: 150px; overflow-y: auto; border: 1px solid #ccc; padding: 5px;"><ul class="leaderboard-list">';
+
+        data.leaderboard.forEach((p, index) => {
+            let className = '';
+            // Highlight Top 3 with emojis
+            let rankStr = `#${index + 1}`;
+            if (index === 0) rankStr = '🥇';
+            if (index === 1) rankStr = '🥈';
+            if (index === 2) rankStr = '🥉';
+
+            if (p.nickname === myNickname) className = 'style="background: #c7d2fe; font-weight:bold;"';
+
+            lbDiv.querySelector('ul').innerHTML += `<li ${className} style="display:flex; justify-content:space-between; padding: 2px 5px;">
+                <span>${rankStr} ${p.nickname}</span> 
+                <span>${p.score}</span>
+            </li>`;
+        });
+        lbDiv.innerHTML += '</ul></div>';
+    }
+
     lastResult = null;
 });
 
 socket.on('quiz_finished', (leaderboard) => {
+    stopMusic(); // Ensure music stops
     showScreen('final-screen');
     const myRank = leaderboard.findIndex(p => p.nickname === myNickname) + 1;
     const myScore = leaderboard.find(p => p.nickname === myNickname)?.score || 0;
